@@ -25,10 +25,13 @@ public interface CopyRepository extends JpaRepository<Copy, Integer> {
                            "AND (:available = false OR copy.available = :available)")
     List<Copy> findByAuthorSearchValue (@Param("author") String author, @Param("available") boolean available);
 
-    @Query(value = "SELECT distinct copy FROM Copy copy WHERE copy.available = :available ")
+    @Query(value = "SELECT distinct copy FROM Copy copy WHERE copy.available = :available")
     List<Copy> findAllByAvailable(@Param("available") boolean available);
 
-    @Query(value = "SELECT copy FROM Copy copy  jOIN copy.book book WHERE (copy.available = true) AND (book.id = :id)")
+    @Query(value = "SELECT copy FROM Copy copy jOIN copy.book book WHERE (copy.available = true) AND (book.id = :id)")
     List<Copy> findAllCopyAvailableForOneBook(@Param("id") Integer id);
+
+    @Query(value = "SELECT copy FROM Copy copy jOIN copy.book book WHERE book.id = :id")
+    List<Copy> findAllCopyForOneBook(@Param("id") Integer id);
 
 }

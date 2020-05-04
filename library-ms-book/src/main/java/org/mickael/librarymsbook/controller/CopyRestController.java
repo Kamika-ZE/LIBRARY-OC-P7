@@ -47,6 +47,16 @@ public class CopyRestController {
         }
     }
 
+    @GetMapping("/book/{id}")
+    public List<Copy> getCopiesForOneBook(@PathVariable Integer id){
+        try {
+            return copyServiceContract.findAllCopyForOneBook(id);
+        } catch (CopyNotFoundException ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Copies found", ex);
+        }
+    }
+
+
     @GetMapping("/search")
     public List<Copy> getCopiesBySearchValue(@RequestParam(value = "criteria", required = false) String criteria,
                                              @RequestParam(value = "searchValue", required = false) String searchValue,

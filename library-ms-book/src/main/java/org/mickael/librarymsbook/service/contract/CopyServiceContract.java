@@ -13,9 +13,11 @@ public interface CopyServiceContract {
 
     List<Copy> findAllCopyAvailableForOneBook(@Param("id") Integer id) throws CopyNotFoundException;
 
+    List<Copy> findAllCopyForOneBook(@Param("id") Integer id) throws CopyNotFoundException;
+
     List<Copy> findAllBySearchParameter (String criteria, String searchValue, boolean available) throws CopyNotFoundException;
 
-    Copy findById (Integer id) throws CopyNotFoundException, CopyNotFoundException;
+    Copy findById (Integer id) throws CopyNotFoundException;
 
     Copy save (Copy copy);
 

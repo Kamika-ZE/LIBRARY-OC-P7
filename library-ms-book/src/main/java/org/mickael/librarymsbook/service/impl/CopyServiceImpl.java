@@ -33,7 +33,18 @@ public class CopyServiceImpl implements CopyServiceContract {
 
     @Override
     public List<Copy> findAllCopyAvailableForOneBook(Integer id) throws CopyNotFoundException {
-        List<Copy> copies = copyRepository.findAllCopyAvailableForOneBook(id);
+        List<Copy> copies = new ArrayList<>();
+        copies = copyRepository.findAllCopyAvailableForOneBook(id);
+        if (copies.isEmpty()){
+            throw new CopyNotFoundException("No copy found");
+        }
+        return copies;
+    }
+
+    @Override
+    public List<Copy> findAllCopyForOneBook(Integer bookId) throws CopyNotFoundException {
+        List<Copy> copies = new ArrayList<>();
+        copies = copyRepository.findAllCopyForOneBook(bookId);
         if (copies.isEmpty()){
             throw new CopyNotFoundException("No copy found");
         }
