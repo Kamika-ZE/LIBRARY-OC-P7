@@ -104,6 +104,16 @@ public class CopyRestController {
         }
     }
 
+    @PutMapping("/book/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateLoanCopy(@PathVariable Integer id){
+        try {
+            copyServiceContract.updateAvailableCopy(id);
+        } catch (CopyNotFoundException ex){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provide correct Copy ID", ex);
+        }
+    }
+
     @DeleteMapping("/{id}")
     //@PreAuthorize("hasAuthority('DELETE')")
     public void deleteCopy(@PathVariable Integer id){

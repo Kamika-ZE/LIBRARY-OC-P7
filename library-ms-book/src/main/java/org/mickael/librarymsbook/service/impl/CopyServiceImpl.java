@@ -103,4 +103,20 @@ public class CopyServiceImpl implements CopyServiceContract {
         copyRepository.deleteById(id);
     }
 
+    @Override
+    public void updateAvailableCopy(Integer id) throws CopyNotFoundException{
+        Optional<Copy> optionalCopy = copyRepository.findById(id);
+        if (!optionalCopy.isPresent()){
+            throw new CopyNotFoundException("Copy not found in repository");
+        }
+        Copy copy = optionalCopy.get();
+        if (copy.isAvailable()){
+            System.out.println(copy.isAvailable());
+            copy.setAvailable(false);
+        } else {
+            copy.setAvailable(true);
+        }
+        copyRepository.save(copy);
+    }
+
 }

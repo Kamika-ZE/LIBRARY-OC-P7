@@ -24,4 +24,6 @@ public interface CopyServiceContract {
     Copy update (Copy copy) throws CopyNotFoundException;
 
     void deleteById (Integer id);
+
+    void updateAvailableCopy(Integer id) throws CopyNotFoundException;
 }

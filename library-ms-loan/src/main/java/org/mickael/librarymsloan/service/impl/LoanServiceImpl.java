@@ -47,13 +47,14 @@ public class LoanServiceImpl implements LoanServiceContract {
     @Override
     public Loan save(Loan loan) {
         Loan savedLoan = new Loan();
-
         savedLoan.setLoanStatus(LoanStatus.ONGOING.getLabel());
         savedLoan.setBeginLoanDate(LocalDate.now());
         savedLoan.setEndingLoanDate(LocalDate.now().plusWeeks(4));
         savedLoan.setExtendLoanDate(LocalDate.now().plusWeeks(8));
         savedLoan.setExtend(false);
-
+        savedLoan.setBookId(loan.getBookId());
+        savedLoan.setCopyId(loan.getCopyId());
+        savedLoan.setCustomerId(loan.getCustomerId());
         return loanRepository.save(savedLoan);
     }
 
@@ -71,20 +72,6 @@ public class LoanServiceImpl implements LoanServiceContract {
         }
         return loanRepository.save(loan);
     }
-
-    @Override
-    public Loan returnLoan(Integer id) throws LoanNotFoundException {
-        Optional<Loan> optionalLoan = loanRepository.findById(id);
-        if (!optionalLoan.isPresent()){
-            throw new LoanNotFoundException("Loan not found in repository");
-        }
-        Loan savedLoan = optionalLoan.get();
-        savedLoan.setLoanStatus(LoanStatus.CLOSED.getLabel());
-        savedLoan.setReturnLoanDate(LocalDate.now());
-        return loanRepository.save(savedLoan);
-    }
-
-
 
     @Override
     public void deleteById(Integer id) {
@@ -141,5 +128,17 @@ public class LoanServiceImpl implements LoanServiceContract {
         }
         loanRepository.saveAll(loans);
         return loans.size();
+    }
+
+    @Override
+    public Loan returnLoan(Integer id) throws LoanNotFoundException {
+        Optional<Loan> optionalLoan = loanRepository.findById(id);
+        if (!optionalLoan.isPresent()){
+            throw new LoanNotFoundException("Loan not found in repository");
+        }
+        Loan savedLoan = optionalLoan.get();
+        savedLoan.setLoanStatus(LoanStatus.CLOSED.getLabel());
+        savedLoan.setReturnLoanDate(LocalDate.now());
+        return loanRepository.save(savedLoan);
     }
 }

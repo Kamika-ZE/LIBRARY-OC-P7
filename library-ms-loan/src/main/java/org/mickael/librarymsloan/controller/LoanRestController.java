@@ -3,6 +3,7 @@ package org.mickael.librarymsloan.controller;
 import org.mickael.librarymsloan.exception.LoanNotFoundException;
 import org.mickael.librarymsloan.model.Loan;
 import org.mickael.librarymsloan.model.LoanMail;
+import org.mickael.librarymsloan.proxy.FeignBookProxy;
 import org.mickael.librarymsloan.service.contract.LoanServiceContract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +25,12 @@ public class LoanRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoanRestController.class);
     private final LoanServiceContract loanServiceContract;
+    private final FeignBookProxy feignBookProxy;
 
     @Autowired
-    public LoanRestController(LoanServiceContract loanServiceContract) {
+    public LoanRestController(LoanServiceContract loanServiceContract, FeignBookProxy feignBookProxy) {
         this.loanServiceContract = loanServiceContract;
+        this.feignBookProxy = feignBookProxy;
     }
 
     @GetMapping
@@ -56,6 +59,7 @@ public class LoanRestController {
             return ResponseEntity.noContent().build();
         }
         Loan loanSaved = loanServiceContract.save(newLoan);
+        feignBookProxy.updateLoanCopy(loanSaved.getCopyId());
         URI location = ServletUriComponentsBuilder
                                .fromCurrentRequest()
                                .path("/{id}")
@@ -76,7 +80,9 @@ public class LoanRestController {
     @ResponseStatus(HttpStatus.OK)
     public Loan returnLoan(@PathVariable Integer id){
         try {
-            return loanServiceContract.returnLoan(id);
+            Loan loan = loanServiceContract.returnLoan(id);
+            feignBookProxy.updateLoanCopy(loan.getCopyId());
+            return loan;
         } catch (LoanNotFoundException ex){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provide correct Loan ID", ex);
         }

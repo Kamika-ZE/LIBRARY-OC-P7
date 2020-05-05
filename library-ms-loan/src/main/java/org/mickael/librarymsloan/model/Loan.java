@@ -34,17 +34,18 @@ public class Loan {
     @Column(name = "return_loan_date")
     private LocalDate returnLoanDate;
 
-    @Column(name = "extend", nullable = false)
+    @Column(name = "extend")
     private boolean extend;
 
     @Column(name = "loan_status")
     private String loanStatus;
 
-
     @Column(name = "customer_id")
     private Integer customerId;
 
-
     @Column(name = "copy_id")
     private Integer copyId;
+
+    @Column(name = "book_id")
+    private Integer bookId;
 }
