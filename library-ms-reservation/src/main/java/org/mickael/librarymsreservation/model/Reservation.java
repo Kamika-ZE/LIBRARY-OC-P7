@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -21,8 +22,23 @@ public class Reservation {
     @Column(name = "reservation_id")
     private Integer id;
 
+    @Column(name = "begin_reservation_date")
+    private LocalDate beginReservationDate;
 
+    @Column(name = "ending_reservation_date")
+    private LocalDate endingReservationDate;
 
+    @Column(name = "customer_id")
+    private Integer customerId;
+
+    @Column(name = "book_id")
+    private Integer bookId;
+
+    @Column(name = "position")
+    private Integer position;
+
+    @Column(name = "book_available")
+    private boolean bookAvailable;
 
 
 

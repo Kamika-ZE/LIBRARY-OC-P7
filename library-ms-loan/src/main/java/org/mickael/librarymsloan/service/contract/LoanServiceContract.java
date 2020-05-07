@@ -2,7 +2,6 @@ package org.mickael.librarymsloan.service.contract;
 
 import org.mickael.librarymsloan.exception.LoanNotFoundException;
 import org.mickael.librarymsloan.model.Loan;
-import org.mickael.librarymsloan.model.LoanMail;
 
 import java.util.List;
 
@@ -26,6 +25,6 @@ public interface LoanServiceContract {
 
     List<Loan> findAllByCustomerId(Integer id) throws LoanNotFoundException;
 
-    List<LoanMail> findDelayLoan();
+    List<Loan> findDelayLoan();
 
 }

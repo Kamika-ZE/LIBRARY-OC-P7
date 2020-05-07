@@ -3,7 +3,6 @@ package org.mickael.librarymsloan.service.impl;
 
 import org.mickael.librarymsloan.exception.LoanNotFoundException;
 import org.mickael.librarymsloan.model.Loan;
-import org.mickael.librarymsloan.model.LoanMail;
 import org.mickael.librarymsloan.model.enumeration.LoanStatus;
 import org.mickael.librarymsloan.repository.LoanRepository;
 import org.mickael.librarymsloan.service.contract.LoanServiceContract;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,20 +86,12 @@ public class LoanServiceImpl implements LoanServiceContract {
     }
 
     @Override
-    public List<LoanMail> findDelayLoan() {
-        List<Loan> delayLoans = loanRepository.findDelayLoan();
-        List<LoanMail> loanMails= new ArrayList<>();
-        for (Loan loan : delayLoans){
-            LoanMail loanMail = new LoanMail();
-            if(loan.isExtend()){
-                loanMail.setExpectedReturn(loan.getExtendLoanDate());
-            } else {
-                loanMail.setExpectedReturn(loan.getEndingLoanDate());
-            }
-            loanMail.setLoanStatus(loan.getLoanStatus());
-            loanMails.add(loanMail);
+    public List<Loan> findDelayLoan() {
+        List<Loan> loans = loanRepository.findDelayLoan();
+        if (loans.isEmpty()){
+            throw new LoanNotFoundException("Loan not found in repository");
         }
-        return loanMails;
+        return loans;
     }
 
     @Override
@@ -112,10 +102,13 @@ public class LoanServiceImpl implements LoanServiceContract {
         }
         Loan extendLoan = new Loan();
         extendLoan.setId(optionalLoan.get().getId());
-        extendLoan.setExtend(true);
         extendLoan.setBeginLoanDate(optionalLoan.get().getBeginLoanDate());
         extendLoan.setEndingLoanDate(optionalLoan.get().getEndingLoanDate());
         extendLoan.setExtendLoanDate(optionalLoan.get().getExtendLoanDate());
+        extendLoan.setCustomerId(optionalLoan.get().getCustomerId());
+        extendLoan.setCopyId(optionalLoan.get().getCopyId());
+        extendLoan.setBookId(optionalLoan.get().getBookId());
+        extendLoan.setExtend(true);
         extendLoan.setLoanStatus(LoanStatus.EXTENDED.getLabel());
         return loanRepository.save(extendLoan);
     }
@@ -124,7 +117,9 @@ public class LoanServiceImpl implements LoanServiceContract {
     public int updateStatus(){
         List<Loan> loans = loanRepository.findAllForUpdateStatus();
         for (Loan loan : loans){
-            loan.setLoanStatus(LoanStatus.OUTDATED.getLabel());
+            if (loan.getEndingLoanDate().compareTo(LocalDate.now()) > 0){
+                loan.setLoanStatus(LoanStatus.OUTDATED.getLabel());
+            }
         }
         loanRepository.saveAll(loans);
         return loans.size();

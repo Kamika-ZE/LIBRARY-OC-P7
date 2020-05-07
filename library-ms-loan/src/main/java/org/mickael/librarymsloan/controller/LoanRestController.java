@@ -2,7 +2,6 @@ package org.mickael.librarymsloan.controller;
 
 import org.mickael.librarymsloan.exception.LoanNotFoundException;
 import org.mickael.librarymsloan.model.Loan;
-import org.mickael.librarymsloan.model.LoanMail;
 import org.mickael.librarymsloan.proxy.FeignBookProxy;
 import org.mickael.librarymsloan.service.contract.LoanServiceContract;
 import org.slf4j.Logger;
@@ -113,7 +112,7 @@ public class LoanRestController {
     }
 
     @GetMapping("/delay")
-    public List<LoanMail> getLoanMail(){
+    public List<Loan> getLoanDelayLoan(){
         return loanServiceContract.findDelayLoan();
     }
 
