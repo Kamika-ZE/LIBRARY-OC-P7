@@ -1,4 +1,4 @@
-package org.mickael.librarymsbook.exception;
+package org.mickael.librarymsreservation.exception;
 
 import feign.Response;
 import feign.codec.ErrorDecoder;

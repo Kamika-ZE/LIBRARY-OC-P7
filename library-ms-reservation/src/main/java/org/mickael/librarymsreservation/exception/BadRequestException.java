@@ -1,12 +1,12 @@
-package org.mickael.librarymsloan.exception;
+package org.mickael.librarymsreservation.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class CustomerBadRequestException extends RuntimeException {
+public class BadRequestException extends RuntimeException {
 
-    public CustomerBadRequestException(String message) {
+    public BadRequestException(String message) {
         super(message);
     }
 }

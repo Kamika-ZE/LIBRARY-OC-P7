@@ -10,9 +10,9 @@ public class CustomErrorDecoder implements ErrorDecoder {
     @Override
     public Exception decode(String invoquer, Response response) {
         if (response.status() == 400){
-            return new LoanBadRequestException("Requête incorrecte");
+            return new BadRequestException(response.body().toString());
         } else if (response.status() == 404){
-            return new LoanNotFoundException("Book not found");
+            return new NotFoundException(response.body().toString());
         }
         return defaultErrorDecoder.decode(invoquer, response);
     }
