@@ -15,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -119,6 +120,11 @@ public class LoanRestController {
     @GetMapping("/update-status")
     public int updateLoanStatus() {
         return loanServiceContract.updateStatus();
+    }
+
+    @GetMapping("/book/{bookId}/soon-returned")
+    public LocalDate getSoonReturned(@PathVariable Integer bookId){
+        return loanServiceContract.findSoonestEndingLoan(bookId);
     }
 
 

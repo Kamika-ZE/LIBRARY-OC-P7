@@ -25,4 +25,6 @@ public interface LoanRepository extends JpaRepository<Loan, Integer> {
                            "(loan.loanStatus = 'En cours' AND loan.endingLoanDate <= current_date) " +
                            "OR (loan.loanStatus = 'Prolongé' AND loan.extend = true AND loan.extendLoanDate <= current_date)")
     List<Loan> findAllForUpdateStatus();
+
+    List<Loan> findAllByBookId(Integer bookId);
 }

@@ -10,7 +10,7 @@ public interface ReservationServiceContract {
     Reservation findById(Integer id);
     Reservation save(Reservation reservation);
     Reservation update(Reservation reservation);
-    void delete(Reservation reservation);
+    void delete(Integer id);
 
 
     List<Reservation> findAllByCustomerId(Integer customerId);
