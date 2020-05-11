@@ -28,6 +28,6 @@ public interface LoanServiceContract {
 
     List<Loan> findDelayLoan();
 
-    LocalDate findSoonestEndingLoan(Integer bookId);
+    List<LocalDate> findSoonestEndingLoan(Integer bookId);
 
 }

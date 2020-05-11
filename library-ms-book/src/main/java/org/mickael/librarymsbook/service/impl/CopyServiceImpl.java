@@ -119,4 +119,9 @@ public class CopyServiceImpl implements CopyServiceContract {
         copyRepository.save(copy);
     }
 
+    @Override
+    public Integer getNumberOfAvailableCopiesForOneBook(Integer bookId) {
+        return copyRepository.findAllCopiesForOneBook(bookId);
+    }
+
 }

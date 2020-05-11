@@ -34,4 +34,8 @@ public interface CopyRepository extends JpaRepository<Copy, Integer> {
     @Query(value = "SELECT copy FROM Copy copy jOIN copy.book book WHERE book.id = :id")
     List<Copy> findAllCopyForOneBook(@Param("id") Integer id);
 
+    @Query(value = "select count (copy) from Copy copy where copy.available=true and copy.book.id = :bookId")
+    Integer findAllCopiesForOneBook(@Param("bookId") Integer bookId);
+
+
 }

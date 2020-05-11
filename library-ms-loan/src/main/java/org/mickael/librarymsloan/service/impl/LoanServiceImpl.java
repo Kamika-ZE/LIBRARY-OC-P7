@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -96,16 +97,20 @@ public class LoanServiceImpl implements LoanServiceContract {
     }
 
     @Override
-    public LocalDate findSoonestEndingLoan(Integer bookId) {
+    public List<LocalDate> findSoonestEndingLoan(Integer bookId) {
         List<Loan> loans = loanRepository.findAllByBookId(bookId);
         for (Loan loan : loans){
             if (loan.isExtend()){
                 loan.setEndingLoanDate(loan.getExtendLoanDate());
             }
         }
-        loans.sort(Comparator.comparing(Loan::getEndingLoanDate).reversed());
-        if (!loans.isEmpty()){
-            return loans.get(0).getEndingLoanDate();
+        loans.sort(Comparator.comparing(Loan::getEndingLoanDate));
+        List<LocalDate> localDates = new ArrayList<>();
+        for (Loan loan : loans){
+            localDates.add(loan.getEndingLoanDate());
+        }
+        if (!localDates.isEmpty()){
+            return localDates;
         } else {
             return null;
         }

@@ -8,8 +8,9 @@ import org.mickael.librarymsreservation.service.contract.ReservationServiceContr
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,12 +36,12 @@ public class ReservationServiceImpl implements ReservationServiceContract {
     }
 
     @Override
-    public Reservation save(Reservation reservation) {
+    public Reservation save(Reservation reservation, List<LocalDate> listReturnLoanDate) {
         Reservation reservationToSave = new Reservation();
 
         //check if the customer already had a reservation
-        Optional<Reservation> optionalReservation = reservationRepository.findByCustomerId(reservation.getCustomerId());
-        if (optionalReservation.isPresent()){
+        Reservation reservationInBdd = reservationRepository.findByCustomerIdAndBookId(reservation.getCustomerId(), reservation.getBookId());
+        if (!reservationInBdd.equals(null)){
             throw new ReservationAlreadyExistException("Vous avez déjà une réservation pour ce livre.");
         }
 
@@ -59,55 +60,70 @@ public class ReservationServiceImpl implements ReservationServiceContract {
         reservationToSave.setBookId(reservation.getBookId());
         reservationToSave.setCustomerId(reservation.getCustomerId());
         reservationToSave.setPosition(lastPosition + 1);
-
-        reservationToSave.setSoonDisponibilityDate(reservation.getSoonDisponibilityDate());
+        reservationToSave.setSoonDisponibilityDate(listReturnLoanDate.get(lastPosition));
 
         //reservationToSave.setBookAvailable(reservation.isBookAvailable());
-        reservationToSave.setCustomerPriority(reservation.isCustomerPriority());
+        //reservationToSave.setCustomerPriority(reservation.isCustomerPriority());
 
         return reservationRepository.save(reservationToSave);
     }
 
+
+
     @Override
-    public Reservation update(Reservation reservation) {
+    public void updateResaBookId(Integer bookId, Integer numberOfCopies) {
+        //get list resa for this book
+        List<Reservation> reservations = reservationRepository.findAllByBookId(bookId);
 
-        Optional<Reservation> reservationToUpdate = reservationRepository.findById(reservation.getId());
-        if (!reservationToUpdate.isPresent()){
-            throw new ReservationNotFoundException("Reservation not Found");
+        //send mail to reservation customer
+        for (int i = 0; i < numberOfCopies; i++) {
+            //send mail
         }
+        //update list resa ?
 
 
-        //get all reservations
-        List<Reservation> allReservations = reservationRepository.findAll();
-
-        //for each book check if a copy is dispo
-
-        //
-        return null;
     }
 
     @Override
-    public void delete(Integer id) {
+    public void updateDateResaBookId(Integer bookId, List<LocalDate> listReturnLoanDate) {
+        List<Reservation> reservations = reservationRepository.findAllByBookId(bookId);
+        reservations.sort(Comparator.comparing(Reservation::getPosition));
+        //change soon to return date
+        for (int i = 0; i < reservations.size(); i++) {
+            reservations.get(i).setSoonDisponibilityDate(listReturnLoanDate.get(i));
+        }
+    }
+
+    @Override
+    public void delete(Integer id, List<LocalDate> listReturnLoanDate) {
+        Optional<Reservation> optionalReservation = reservationRepository.findById(id);
+        if (!optionalReservation.isPresent()){
+            throw new ReservationNotFoundException("Reservation not Found");
+        }
         //get resa
-        Reservation reservationToDelete = reservationRepository.findById(id).get();
+        Reservation reservationToDelete = optionalReservation.get();
 
         //delete
         reservationRepository.deleteById(id);
 
         //modify list resa
-        //get all the reservation for the book to know the position in the list
+        //get new list of all reservations for the book
         List<Reservation> reservations = reservationRepository.findAllByBookId(reservationToDelete.getBookId());
 
         //set last position in the reservation list
-        Integer lastPosition = reservations.size();
-
-        Integer deletePosition = reservationToDelete.getPosition();
+        //Integer lastPosition = reservations.size();
+        Integer deleteReservationPosition = reservationToDelete.getPosition();
 
         //change all position
         for (Reservation reservation : reservations){
-            if (reservation.getPosition() > deletePosition){
+            if (reservation.getPosition() > deleteReservationPosition){
                 reservation.setPosition(reservation.getPosition() - 1);
             }
+        }
+        reservations.sort(Comparator.comparing(Reservation::getPosition));
+        //change soon to return date
+        for (int i = 0; i < reservations.size(); i++) {
+            reservations.get(i).setSoonDisponibilityDate(listReturnLoanDate.get(i));
         }
         reservationRepository.saveAll(reservations);
 
@@ -118,15 +134,18 @@ public class ReservationServiceImpl implements ReservationServiceContract {
         return null;
     }
 
+
     @Override
-    public Integer findReservationPositionForBookId(Integer bookId) {
-        List<Reservation> reservations = reservationRepository.findAllByBookId(bookId);
+    public boolean checkIfReservationExistForCustomerIdAndBookId(Integer customerId, Integer bookId) {
+        return reservationRepository.existByCustomerIdAndBookId(customerId, bookId);
+    }
 
-        //sort the list by increase date
-        Collections.sort(reservations, (a, b) -> a.getCreationReservationDate().compareTo(b.getCreationReservationDate()));
-
-        //
-
-        return null;
+    @Override
+    public Reservation findByCustomerIdAndBookId(Integer customerId, Integer bookId) {
+        Reservation reservation = reservationRepository.findByCustomerIdAndBookId(customerId, bookId);
+        if (reservation.equals(null)){
+            throw new ReservationNotFoundException("No reservation for this customer and book");
+        }
+        return reservation;
     }
 }

@@ -29,6 +29,9 @@ public class Reservation {
     @Column(name = "soon_disponibility_date")
     private LocalDate soonDisponibilityDate;
 
+    @Column(name = "end_of_priority")
+    private LocalDate endOfPriority;
+
     @Column(name = "customer_id")
     private Integer customerId;
 

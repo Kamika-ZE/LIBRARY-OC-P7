@@ -120,5 +120,20 @@ public class CopyRestController {
         copyServiceContract.deleteById(id);
     }
 
+    @GetMapping("/available/book/{bookId}")
+    public boolean checkIfCopyAvailableForBook(@PathVariable Integer bookId){
+        List<Copy> copies = copyServiceContract.findAllCopyAvailableForOneBook(bookId);
+        if (!copies.isEmpty()){
+            return true;
+        }
+        return false;
+    }
+
+    @GetMapping("/available-number/book/{bookId}")
+    public Integer numberOfCopyAvailableForBook(@PathVariable Integer bookId){
+        Integer number = copyServiceContract.getNumberOfAvailableCopiesForOneBook(bookId);
+        return number;
+    }
+
 
 }

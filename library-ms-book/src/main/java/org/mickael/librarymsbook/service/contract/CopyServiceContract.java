@@ -26,4 +26,6 @@ public interface CopyServiceContract {
     void deleteById (Integer id);
 
     void updateAvailableCopy(Integer id) throws CopyNotFoundException;
+
+    Integer getNumberOfAvailableCopiesForOneBook(Integer bookId);
 }
