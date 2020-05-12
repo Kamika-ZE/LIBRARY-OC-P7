@@ -67,7 +67,7 @@ public class ReservationRestController {
 
     @PutMapping("/book/{bookId}")
     public void updateReservation(@PathVariable Integer bookId){
-        reservationServiceContract.updateResaBookId(feignBookProxy.retrieveBook(bookId),
+        reservationServiceContract.updateResaBookId(bookId,
                 feignBookProxy.numberOfCopyAvailableForBook(bookId));
     }
 

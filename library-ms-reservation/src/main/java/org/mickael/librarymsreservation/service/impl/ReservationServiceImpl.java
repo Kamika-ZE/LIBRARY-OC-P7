@@ -92,11 +92,14 @@ public class ReservationServiceImpl implements ReservationServiceContract {
             }
 
             //send mail
-
+            sendPreConfiguredMail(
+                    reservations.get(i).getCustomerEmail(),
+                    reservations.get(i).getCustomerFirstname(),
+                    reservations.get(i).getCustomerLastname(),
+                    formatDateTimeToMail(reservations.get(i).getCreationReservationDate()),
+                    reservations.get(i).getBookTitle(),
+                    formatDateToMail(reservations.get(i).getEndOfPriority()));
         }
-        //update list resa ?
-
-
     }
 
     @Override
@@ -173,9 +176,9 @@ public class ReservationServiceImpl implements ReservationServiceContract {
      * @param date the date of the expected return
      *
      * */
-    private void sendPreConfiguredMail(String argTo, String argFirst, String argLast, String argTitle, String date){
+    private void sendPreConfiguredMail(String argTo, String argFirst, String argLast, String resaDate, String argTitle, String date){
         SimpleMailMessage mailMessage = new SimpleMailMessage(preConfiguredMessage);
-        String text = String.format(Objects.requireNonNull(mailMessage.getText()),argFirst, argLast, argTitle, date);
+        String text = String.format(Objects.requireNonNull(mailMessage.getText()),argFirst, argLast, resaDate, argTitle, date);
         mailMessage.setTo(argTo);
         mailMessage.setText(text);
         javaMailSender.send(mailMessage);
@@ -197,6 +200,18 @@ public class ReservationServiceImpl implements ReservationServiceContract {
      * @return a formatted date
      */
     private String formatDateToMail(LocalDate date){
+        String pattern = "dd MMM yyyy";
+        return date.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+
+    /**
+     * This method format the expected return date
+     *
+     * @param date a date
+     * @return a formatted date
+     */
+    private String formatDateTimeToMail(LocalDateTime date){
         String pattern = "dd MMM yyyy";
         return date.format(DateTimeFormatter.ofPattern(pattern));
     }
