@@ -32,7 +32,7 @@
                         <div><b>Disponibilités :</b>
                             <span th:text="${book.copies.size()}"></span> / <span th:text="${book.stock}"></span>
 <!--                            <span th:if="${book.copies.size() != 0}">
-                                <a th:href="@{|/reservations/reserve/${book.id}|}">
+                                <a th:href="@{|/reservations/book/${book.id}/reserve|}">
                                     <button type="submit" class="btn-sm btn-group-sm action-button">Réserver</button>
                                 </a>
                             </span>-->

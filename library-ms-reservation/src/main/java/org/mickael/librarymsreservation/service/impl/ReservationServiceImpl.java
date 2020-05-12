@@ -6,28 +6,37 @@ import org.mickael.librarymsreservation.model.Reservation;
 import org.mickael.librarymsreservation.repository.ReservationRepository;
 import org.mickael.librarymsreservation.service.contract.ReservationServiceContract;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class ReservationServiceImpl implements ReservationServiceContract {
 
     private final ReservationRepository reservationRepository;
+    private JavaMailSender javaMailSender;
+    private SimpleMailMessage preConfiguredMessage;
 
     @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, JavaMailSender javaMailSender, SimpleMailMessage preConfiguredMessage) {
         this.reservationRepository = reservationRepository;
+        this.javaMailSender = javaMailSender;
+        this.preConfiguredMessage = preConfiguredMessage;
     }
 
 
     @Override
     public List<Reservation> findAll() {
-        return null;
+        return reservationRepository.findAll();
     }
 
     @Override
@@ -41,7 +50,7 @@ public class ReservationServiceImpl implements ReservationServiceContract {
 
         //check if the customer already had a reservation
         Reservation reservationInBdd = reservationRepository.findByCustomerIdAndBookId(reservation.getCustomerId(), reservation.getBookId());
-        if (!reservationInBdd.equals(null)){
+        if (!(reservationInBdd == null)){
             throw new ReservationAlreadyExistException("Vous avez déjà une réservation pour ce livre.");
         }
 
@@ -50,7 +59,7 @@ public class ReservationServiceImpl implements ReservationServiceContract {
 
         //set last position in the reservation list
         Integer lastPosition;
-        if (reservations.isEmpty() || reservations.equals(null)){
+        if (reservations.isEmpty() || (reservations == null) ){
             lastPosition = 0;
         } else {
             lastPosition = reservations.size();
@@ -62,9 +71,6 @@ public class ReservationServiceImpl implements ReservationServiceContract {
         reservationToSave.setPosition(lastPosition + 1);
         reservationToSave.setSoonDisponibilityDate(listReturnLoanDate.get(lastPosition));
 
-        //reservationToSave.setBookAvailable(reservation.isBookAvailable());
-        //reservationToSave.setCustomerPriority(reservation.isCustomerPriority());
-
         return reservationRepository.save(reservationToSave);
     }
 
@@ -74,9 +80,17 @@ public class ReservationServiceImpl implements ReservationServiceContract {
     public void updateResaBookId(Integer bookId, Integer numberOfCopies) {
         //get list resa for this book
         List<Reservation> reservations = reservationRepository.findAllByBookId(bookId);
-
+        reservations.sort(Comparator.comparing(Reservation::getPosition));
         //send mail to reservation customer
         for (int i = 0; i < numberOfCopies; i++) {
+            //set end resa date
+            if ((LocalDate.now().getDayOfWeek() == DayOfWeek.SATURDAY)
+                        || (LocalDate.now().getDayOfWeek() == DayOfWeek.SUNDAY)){
+                reservations.get(i).setEndOfPriority(LocalDate.now().plusDays(4));
+            } else {
+                reservations.get(i).setEndOfPriority(LocalDate.now().plusDays(2));
+            }
+
             //send mail
         }
         //update list resa ?
@@ -131,7 +145,7 @@ public class ReservationServiceImpl implements ReservationServiceContract {
 
     @Override
     public List<Reservation> findAllByCustomerId(Integer customerId) {
-        return null;
+        return reservationRepository.findAllByCustomerId(customerId);
     }
 
 
@@ -143,9 +157,46 @@ public class ReservationServiceImpl implements ReservationServiceContract {
     @Override
     public Reservation findByCustomerIdAndBookId(Integer customerId, Integer bookId) {
         Reservation reservation = reservationRepository.findByCustomerIdAndBookId(customerId, bookId);
-        if (reservation.equals(null)){
+        if (reservation == null){
             throw new ReservationNotFoundException("No reservation for this customer and book");
         }
         return reservation;
+    }
+
+    /**
+     * This method will send a pre-configured message
+     * @param argTo the email of the recipient
+     * @param argFirst the firstName of the recipient
+     * @param argLast the lastName of the recipient
+     * @param argTitle the title of the book
+     * @param date the date of the expected return
+     *
+     * */
+    private void sendPreConfiguredMail(String argTo, String argFirst, String argLast, String argTitle, String date){
+        SimpleMailMessage mailMessage = new SimpleMailMessage(preConfiguredMessage);
+        String text = String.format(Objects.requireNonNull(mailMessage.getText()),argFirst, argLast, argTitle, date);
+        mailMessage.setTo(argTo);
+        mailMessage.setText(text);
+        javaMailSender.send(mailMessage);
+    }
+
+
+    private void sendSimpleMessage(String to, String subject, String body){
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+        javaMailSender.send(message);
+    }
+
+    /**
+     * This method format the expected return date
+     *
+     * @param date a date
+     * @return a formatted date
+     */
+    private String formatDateToMail(LocalDate date){
+        String pattern = "dd MMM yyyy";
+        return date.format(DateTimeFormatter.ofPattern(pattern));
     }
 }

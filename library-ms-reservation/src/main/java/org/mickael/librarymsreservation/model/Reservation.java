@@ -41,14 +41,5 @@ public class Reservation {
     @Column(name = "position")
     private Integer position;
 
-    @Column(name = "book_available")
-    private boolean bookAvailable;
-
-    @Column(name = "customer_priority")
-    private boolean customerPriority;
-
-
-
-
 
 }

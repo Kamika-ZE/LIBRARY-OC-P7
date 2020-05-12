@@ -19,9 +19,10 @@ import java.util.List;
 public class BookController {
 
     private final FeignBookProxy feignBookProxy;
+
     private static final String LIST_BOOK = "books";
-    private static final String LIST_COPY = "copies";
     private static final String BOOK = "book";
+    private static final String CATALOG = "catalog";
 
 
     @Autowired
@@ -33,7 +34,7 @@ public class BookController {
     public String showCatalog(Model model, @CookieValue(value = CookieUtils.HEADER, required = false)String accessToken){
         model.addAttribute(LIST_BOOK, feignBookProxy.getBooks(/*"Bearer " + accessToken*/));
         model.addAttribute("searchAttribut", new SearchBean());
-        return "catalog";
+        return CATALOG;
     }
 
     @PostMapping("/catalog/search")
@@ -42,12 +43,12 @@ public class BookController {
         try{
             List<BookBean> books = feignBookProxy.getBooksBySearchValue(searchBean/*,"Bearer " + accessToken*/);
             model.addAttribute(LIST_BOOK, books);
-            return "catalog";
+            return CATALOG;
         } catch (Exception e){
             List<BookBean> books = new ArrayList<>();
             model.addAttribute(LIST_BOOK, books);
             model.addAttribute("NoResult", "Pas de résultats");
-            return "catalog";
+            return CATALOG;
         }
     }
 
@@ -65,5 +66,7 @@ public class BookController {
         model.addAttribute("book", book);
         return BOOK;
     }
+
+
 
 }
