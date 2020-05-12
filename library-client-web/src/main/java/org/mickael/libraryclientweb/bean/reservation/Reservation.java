@@ -19,7 +19,11 @@ public class Reservation {
     private LocalDate soonDisponibilityDate;
     private LocalDate endOfPriority;
     private Integer customerId;
+    private String customerEmail;
+    private String customerFirstname;
+    private String customerLastname;
     private Integer bookId;
+    private String bookTitle;
     private Integer position;
 
 }

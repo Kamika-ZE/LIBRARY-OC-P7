@@ -35,8 +35,20 @@ public class Reservation {
     @Column(name = "customer_id")
     private Integer customerId;
 
+    @Column(name = "customer_email")
+    private String customerEmail;
+
+    @Column(name = "customer_firstname")
+    private String customerFirstname;
+
+    @Column(name = "customer_lastname")
+    private String customerLastname;
+
     @Column(name = "book_id")
     private Integer bookId;
+
+    @Column(name = "book_title")
+    private String bookTitle;
 
     @Column(name = "position")
     private Integer position;

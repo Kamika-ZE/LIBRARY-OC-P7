@@ -9,5 +9,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReservationMail {
+public class Customer {
+
+    private Integer id;
+    private String email;
+    private String firstName;
+    private String lastName;
+
 }
