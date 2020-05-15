@@ -7,13 +7,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Entity
 @Getter
@@ -50,40 +46,15 @@ public class Customer {
     @Email(message = "Email should be valid")
     private String email;
 
-    @Column(name = "password", nullable = false)
-    @NotBlank(message = "Please enter a password")
-    private String password;
-
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate;
 
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-    @Column(name = "roles", nullable = false)
-    private String roles;
-
-    @Column(name = "permissions")
-    private String permissions;
-
-    @Column(name = "account_status", nullable = false)
-    private boolean active;
-
     @JsonIgnore
-    public List<String> getRolesList() {
-        if (this.roles.length() > 0) {
-            return Arrays.asList(this.roles.split(","));
-        }
-        return new ArrayList<>();
-    }
-
-    @JsonIgnore
-    public List<String> getPermissionsList() {
-        if (this.permissions.length() > 0) {
-            return Arrays.asList(this.permissions.split(","));
-        }
-        return new ArrayList<>();
-    }
+    @Column(name = "user_id")
+    private Integer userId;
 
     @Override
     public String toString() {
@@ -94,12 +65,8 @@ public class Customer {
                        ", address=" + address +
                        ", phoneNumber='" + phoneNumber + '\'' +
                        ", email='" + email + '\'' +
-                       ", password='" + password + '\'' +
                        ", registrationDate=" + registrationDate +
                        ", updateDate=" + updateDate +
-                       ", roles='" + roles + '\'' +
-                       ", permissions='" + permissions + '\'' +
-                       ", active=" + active +
                        '}';
     }
 }
