@@ -1,6 +1,5 @@
 package org.mickael.librarymsreservation.proxy;
 
-import org.mickael.librarymsreservation.model.Book;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +16,10 @@ public interface FeignBookProxy {
     @GetMapping("/api/copies/available-number/book/{bookId}")
     Integer numberOfCopyAvailableForBook(@PathVariable("bookId")  Integer bookId);
 
+/*
     @GetMapping("/api/books/{id}")
     Book retrieveBook(@PathVariable("id") Integer id);
+*/
 
 
 

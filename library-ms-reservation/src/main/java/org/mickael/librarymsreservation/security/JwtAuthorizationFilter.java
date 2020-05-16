@@ -1,12 +1,11 @@
-package org.mickael.libraryauthserver.security;
+package org.mickael.librarymsreservation.security;
 
 import com.auth0.jwt.JWT;
-import org.mickael.libraryauthserver.model.MyUserPrincipal;
-import org.mickael.libraryauthserver.model.User;
-import org.mickael.libraryauthserver.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -15,17 +14,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    private UserRepository userRepository;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
-        this.userRepository = userRepository;
     }
 
     @Override
@@ -63,9 +63,18 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             // Search in the DB if we find the user by token subject (username)
             // If so, then grab user details and create spring auth token using username, pass, authorities/roles
             if (username != null) {
-                User user = userRepository.findByUsername(username);
-                MyUserPrincipal principal = new MyUserPrincipal(user);
-                return new UsernamePasswordAuthenticationToken(username, null, principal.getAuthorities());
+                String authoritiesJwt = JWT.require(HMAC512(JwtProperties.SECRET.getBytes()))
+                                                   .build()
+                                                   .verify(token)
+                                            .getClaim("authorities").toString();
+                List<String> authoritiesList = Arrays.asList(authoritiesJwt.split(","));
+                List<GrantedAuthority> authorities = new ArrayList<>();
+                authoritiesList.forEach(p -> {
+                    GrantedAuthority authority = new SimpleGrantedAuthority(p);
+                    authorities.add(authority);
+                });
+
+                return new UsernamePasswordAuthenticationToken(username, null, authorities);
             }
             return null;
         }

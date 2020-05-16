@@ -4,7 +4,7 @@ package org.mickael.libraryclientweb.controller;
 import org.mickael.libraryclientweb.bean.book.BookBean;
 import org.mickael.libraryclientweb.bean.book.CopyBean;
 import org.mickael.libraryclientweb.bean.book.SearchBean;
-import org.mickael.libraryclientweb.proxy.FeignBookProxy;
+import org.mickael.libraryclientweb.proxy.FeignProxy;
 import org.mickael.libraryclientweb.security.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/books")
 public class BookController {
 
-    private final FeignBookProxy feignBookProxy;
+    private final FeignProxy feignProxy;
 
     private static final String LIST_BOOK = "books";
     private static final String BOOK = "book";
@@ -26,13 +26,13 @@ public class BookController {
 
 
     @Autowired
-    public BookController(FeignBookProxy feignBookProxy) {
-        this.feignBookProxy = feignBookProxy;
+    public BookController(FeignProxy feignProxy) {
+        this.feignProxy = feignProxy;
     }
 
     @GetMapping("/catalog")
     public String showCatalog(Model model, @CookieValue(value = CookieUtils.HEADER, required = false)String accessToken){
-        model.addAttribute(LIST_BOOK, feignBookProxy.getBooks(/*"Bearer " + accessToken*/));
+        model.addAttribute(LIST_BOOK, feignProxy.getBooks("Bearer " + accessToken));
         model.addAttribute("searchAttribut", new SearchBean());
         return CATALOG;
     }
@@ -41,7 +41,7 @@ public class BookController {
     public String displaySearchResult(@ModelAttribute("searchAttribut") SearchBean searchBean, Model model,
                                       @CookieValue(value = CookieUtils.HEADER, required = false)String accessToken){
         try{
-            List<BookBean> books = feignBookProxy.getBooksBySearchValue(searchBean/*,"Bearer " + accessToken*/);
+            List<BookBean> books = feignProxy.getBooksBySearchValue(searchBean,"Bearer " + accessToken);
             model.addAttribute(LIST_BOOK, books);
             return CATALOG;
         } catch (Exception e){
@@ -55,10 +55,10 @@ public class BookController {
     @GetMapping("/catalog/book/{id}")
     public String showBook(@PathVariable Integer id, Model model, @CookieValue(value = CookieUtils.HEADER, required = false)String accessToken){
         accessToken = "Bearer " + accessToken;
-        BookBean book = feignBookProxy.retrieveBook(id/*, accessToken*/);
+        BookBean book = feignProxy.retrieveBook(id, accessToken);
         List<CopyBean> copies;
         try{
-            copies = feignBookProxy.getCopiesAvailableForOneBook(id/*, accessToken*/);
+            copies = feignProxy.getCopiesAvailableForOneBook(id, accessToken);
         } catch (Exception e){
             copies = new ArrayList<>();
         }

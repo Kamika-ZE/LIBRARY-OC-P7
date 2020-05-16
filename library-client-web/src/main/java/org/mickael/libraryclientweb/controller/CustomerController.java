@@ -2,15 +2,16 @@ package org.mickael.libraryclientweb.controller;
 
 import org.mickael.libraryclientweb.bean.customer.CustomerBean;
 import org.mickael.libraryclientweb.bean.loan.LoanBean;
-import org.mickael.libraryclientweb.proxy.FeignBookProxy;
-import org.mickael.libraryclientweb.proxy.FeignCustomerProxy;
-import org.mickael.libraryclientweb.proxy.FeignLoanProxy;
+import org.mickael.libraryclientweb.proxy.FeignProxy;
 import org.mickael.libraryclientweb.security.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -20,9 +21,8 @@ import java.util.List;
 @RequestMapping("/customers")
 public class CustomerController {
 
-    private final FeignBookProxy feignBookProxy;
-    private final FeignCustomerProxy feignCustomerProxy;
-    private final FeignLoanProxy feignLoanProxy;
+
+    private final FeignProxy feignProxy;
     private static final String DASHBOARD_VIEW = "dashboard";
     private static final String ACCOUNT_ATT = "accountBean";
     private static final String ERROR_ATT = "errorMessage";
@@ -33,22 +33,20 @@ public class CustomerController {
 
 
     @Autowired
-    public CustomerController(FeignBookProxy feignBookProxy, FeignCustomerProxy feignCustomerProxy, FeignLoanProxy feignLoanProxy) {
-        this.feignBookProxy = feignBookProxy;
-        this.feignCustomerProxy = feignCustomerProxy;
-        this.feignLoanProxy = feignLoanProxy;
+    public CustomerController(FeignProxy feignProxy) {
+        this.feignProxy = feignProxy;
     }
 
 
     @GetMapping("/dashboard")
-    public String accounts(/*@CookieValue(value = CookieUtils.HEADER, required = false)String accessToken, */Model model){
-        //Integer userId = CookieUtils.getUserIdFromJWT(accessToken);
-        Integer customerId = 2;
-        CustomerBean customerBean = feignCustomerProxy.retrieveAccount(customerId/*, "Bearer " + accessToken*/);
-        List<LoanBean> loanBeans = feignLoanProxy.findAllByCustomerId(customerId/*, "Bearer " + accessToken*/);
+    public String accounts(@CookieValue(value = CookieUtils.HEADER, required = false)String accessToken, Model model){
+        if (accessToken == null) return REDIRECT_LOGIN_VIEW;
+        Integer customerId = CookieUtils.getUserIdFromJWT(accessToken);
+        CustomerBean customerBean = feignProxy.retrieveAccount(customerId, "Bearer " + accessToken);
+        List<LoanBean> loanBeans = feignProxy.findAllByCustomerId(customerId, "Bearer " + accessToken);
         for (LoanBean loanBean : loanBeans){
             loanBean.setCustomer(customerBean);
-            loanBean.setCopy(feignBookProxy.retrieveCopy(loanBean.getCopyId()));
+            loanBean.setCopy(feignProxy.retrieveCopy(loanBean.getCopyId(), "Bearer " + accessToken));
         }
         model.addAttribute("customer", customerBean);
         model.addAttribute("loans", loanBeans);
@@ -56,11 +54,11 @@ public class CustomerController {
     }
 
     @GetMapping("/edit/account")
-    public String displayAccountForm(Model model/*, @CookieValue(value = CookieUtils.HEADER, required = false) String accessToken*/){
-     /*   if (accessToken == null) return REDIRECT_LOGIN_VIEW;
-        Integer userId = CookieUtils.getUserIdFromJWT(accessToken);*/
+    public String displayAccountForm(Model model, @CookieValue(value = CookieUtils.HEADER, required = false) String accessToken){
+        if (accessToken == null) return REDIRECT_LOGIN_VIEW;
+        Integer userId = CookieUtils.getUserIdFromJWT(accessToken);
         Integer customerId = 2;
-        CustomerBean customerBean = feignCustomerProxy.retrieveAccount(customerId/*, "Bearer " + accessToken*/);
+        CustomerBean customerBean = feignProxy.retrieveAccount(customerId, "Bearer " + accessToken);
         model.addAttribute(ACCOUNT_ATT, customerBean);
         return ACCOUNT_FORM_VIEW;
     }
@@ -77,17 +75,17 @@ public class CustomerController {
         }
         Integer userId = CookieUtils.getUserIdFromJWT(accessToken);
         //update account
-        CustomerBean updateAccount = feignCustomerProxy.updateAccount(userId, customerBean/*, "Bearer " + accessToken*/);
+        CustomerBean updateAccount = feignProxy.updateAccount(userId, customerBean, "Bearer " + accessToken);
 
 
         model.addAttribute(ACCOUNT_ATT, updateAccount);
         if (updateAccount != null) {
-           /* //refresh token
+/*            //refresh token
             AccountLoginBean accountLoginBean = new AccountLoginBean();
             accountLoginBean.setUsername(updateAccount.getEmail());
             accountLoginBean.setPassword(updateAccount.getPassword());
             CookieUtils.clear(response);
-            ResponseEntity responseEntity = feignProxy.login(accountLoginBean);
+            ResponseEntity responseEntity = feignCustomerProxy.login(accountLoginBean);
             String token = responseEntity.getHeaders().getFirst("Authorization").replace("Bearer ", "");
             Cookie cookie = CookieUtils.generateCookie(token);
             response.addCookie(cookie);

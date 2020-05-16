@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
-//@PreAuthorize("isAuthenticated()")
+@PreAuthorize("isAuthenticated()")
 public class BookRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(BookRestController.class);
@@ -60,7 +61,7 @@ public class BookRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    //@PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<Book> createNewBook(@Valid @RequestBody Book newBook){
         if (newBook == null){
             return ResponseEntity.noContent().build();
@@ -75,7 +76,7 @@ public class BookRestController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Book updateBook(@PathVariable Integer id, @RequestBody Book book){
         try {
             return bookServiceContract.update(book);
@@ -85,7 +86,7 @@ public class BookRestController {
     }
 
     @DeleteMapping("/{id}")
-    //@PreAuthorize("hasAuthority('DELETE')")
+    @PreAuthorize("hasAuthority('DELETE')")
     public void deleteBook(@PathVariable Integer id){
         bookServiceContract.deleteById(id);
     }
