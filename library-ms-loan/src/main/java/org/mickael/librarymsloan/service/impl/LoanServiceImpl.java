@@ -7,6 +7,7 @@ import org.mickael.librarymsloan.model.enumeration.LoanStatus;
 import org.mickael.librarymsloan.repository.LoanRepository;
 import org.mickael.librarymsloan.service.contract.LoanServiceContract;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -78,7 +79,7 @@ public class LoanServiceImpl implements LoanServiceContract {
 
     @Override
     public List<Loan> findAllByCustomerId(Integer customerId) throws LoanNotFoundException {
-        List<Loan> loans = loanRepository.findAllByCustomerId(customerId);
+        List<Loan> loans = loanRepository.findAllByCustomerId(customerId, Sort.by("loanStatus"));
         if (loans.isEmpty()){
             throw new LoanNotFoundException("Loan not found in repository");
         }
