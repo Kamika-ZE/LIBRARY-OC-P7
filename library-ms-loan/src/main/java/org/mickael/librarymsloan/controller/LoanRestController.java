@@ -54,14 +54,12 @@ public class LoanRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createNewLoan(@Valid @RequestBody Loan newLoan){
+    public ResponseEntity<Void> createNewLoan(@Valid @RequestBody Loan newLoan, @RequestHeader("Authorization") String accessToken){
         if (newLoan == null){
             return ResponseEntity.noContent().build();
         }
-
-
         Loan loanSaved = loanServiceContract.save(newLoan);
-        feignBookProxy.updateLoanCopy(loanSaved.getCopyId());
+        feignBookProxy.updateLoanCopy(loanSaved.getCopyId(), accessToken);
         URI location = ServletUriComponentsBuilder
                                .fromCurrentRequest()
                                .path("/{id}")
@@ -80,10 +78,10 @@ public class LoanRestController {
     }
     @PutMapping("/return/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Loan returnLoan(@PathVariable Integer id){
+    public Loan returnLoan(@PathVariable Integer id, @RequestHeader("Authorization") String accessToken){
         try {
             Loan loan = loanServiceContract.returnLoan(id);
-            feignBookProxy.updateLoanCopy(loan.getCopyId());
+            feignBookProxy.updateLoanCopy(loan.getCopyId(), accessToken);
 
             return loan;
         } catch (LoanNotFoundException ex){
