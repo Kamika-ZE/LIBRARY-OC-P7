@@ -64,11 +64,11 @@ L'application a été développée suivant une architecture microservice
 
 1- Importez tous les microservices du repository.
 
-2- Créé une base de données pour chaque microservice. Les scripts sont dans le dossier "livrables/script".
+2- Créez une base de données pour chaque microservice. Les scripts sont dans le dossier "livrables/script".
 Vous devez modifier les propriétés de la datasource dans chaque fichier "application.properties" de chaque
 microservice (dans src/main/resources/).
 
-3- Lancer l'application : démarrez "library-eureka" en premier.
+3- Lancez l'application : démarrez "library-eureka" en premier et "library-batch" en dernier. 
 
 Dans votre navigateur, vous pourrez accéder au site à l'addresse localhost:8080, si vous n'avez pas modifié
 les propriétés "server.port".
