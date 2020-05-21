@@ -13,7 +13,7 @@
             <div class="info-user-buttons-container">
                 <div class="dashboard-card card-user">
                     <div class="picture-profil">
-                        <img th:src="@{/image/profil-picture-1.jpeg}" alt="photo de profil" src="" />
+                        <img th:src="@{/image/profil-picture-1.jpeg}" alt="photo de profil" src=""/>
                     </div>
                     <div class="info-user">
                         <p>Nom : <span th:text="${customer.lastName}"></span></p>
@@ -36,61 +36,63 @@
                 <div class="loan-list">
                     <!-- Loan list -->
                     <div th:each="loan : ${loans}" class="catalog-item">
-                        <a th:href="@{'/books/catalog/book/' + ${loan.copy.book.id}}">
-                            <div th:classappend="${(loan.loanStatus.equalsIgnoreCase('Rendu') ? 'inside-item finish-item' : 'inside-item' )}">
+                        <div th:classappend="${(loan.loanStatus.equalsIgnoreCase('Rendu') ? 'inside-item finish-item' : 'inside-item' )}">
+                            <a th:href="@{|/books/catalog/book/${loan.copy.book.id}|}">
                                 <div class="cover-item">
-                                    <img th:src="${loan.copy.book.cover.getUrl()}" alt="couverture du livre" src="">
+                                    <img th:src="${loan.copy.book.cover.getUrl()}" alt="couverture du livre"
+                                         src="">
                                 </div>
-                                <div class="info-item">
-                                    <div class="header-item">
-                                        <div class="title-book" th:text="${loan.copy.book.title}"></div>
-                                        <div class="loan-button-status">
-                                            <div th:if="${!(loan.loanStatus.equalsIgnoreCase('Rendu') || loan.loanStatus.equalsIgnoreCase('En retard'))}" class="extend-button">
+                            </a>
+                            <div class="info-item">
+                                <div class="header-item">
+                                    <div class="title-book" th:text="${loan.copy.book.title}"></div>
+                                    <div class="loan-button-status">
+                                        <div th:if="${!(loan.loanStatus.equalsIgnoreCase('Rendu') || loan.loanStatus.equalsIgnoreCase('En retard'))}"
+                                             class="extend-button">
                                                 <span th:if="${loan.extend}" class="extend-button-disable">
                                                 <i class="fas fa-history"></i>
                                                 </span>
-                                                <span th:unless="${loan.extend}">
+                                            <span th:unless="${loan.extend}">
                                                     <a th:href="@{|/loans/extend/${loan.id}|}">
                                                         <i class="fas fa-history"></i>
                                                     </a>
                                                 </span>
-                                            </div>
-                                            <div th:classappend="${(loan.loanStatus.equalsIgnoreCase('Rendu')? 'closed' : '' ) +
+                                        </div>
+                                        <div th:classappend="${(loan.loanStatus.equalsIgnoreCase('Rendu')? 'closed' : '' ) +
                                                                (loan.loanStatus.equalsIgnoreCase('Prolongé')? 'extended' : '' ) +
                                                                (loan.loanStatus.equalsIgnoreCase('En retard')? 'outdated' : '' ) +
                                                                (loan.loanStatus.equalsIgnoreCase('En cours')? 'ongoing' : '' )}">
-                                                <span th:text="${loan.loanStatus}"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div th:if="${!loan.loanStatus.equalsIgnoreCase('Rendu')}" class="return-date">
-                                        <div>
-                                            <b>Emprunté le :</b>
-                                            <span th:text="${#temporals.format(loan.beginLoanDate,'dd MMM YYYY')}"></span>
-                                        </div>
-                                        <div th:if="${!loan.loanStatus.equalsIgnoreCase('Prolongé')}">
-                                            <b>A rendre avant le :</b>
-                                            <span th:text="${#temporals.format(loan.endingLoanDate,'dd MMM YYYY')}"></span>
-                                        </div>
-                                        <div th:unless="${!loan.loanStatus.equalsIgnoreCase('Prolongé')}">
-                                            <b>A rendre avant le :</b>
-                                            <span th:text="${#temporals.format(loan.extendLoanDate,'dd MMM YYYY')}"></span>
-                                        </div>
-                                    </div>
-                                    <div th:unless="${!loan.loanStatus.equalsIgnoreCase('Rendu')}"
-                                         class="return-date disabled-text">
-                                        <div>
-                                            Emprunté le :
-                                            <span th:text="${#temporals.format(loan.beginLoanDate,'dd MMM YYYY')}"></span>
-                                        </div>
-                                        <div>
-                                            Rendu le :
-                                            <span th:text="${#temporals.format(loan.returnLoanDate,'dd MMM YYYY')}"></span>
+                                            <span th:text="${loan.loanStatus}"></span>
                                         </div>
                                     </div>
                                 </div>
+                                <div th:if="${!loan.loanStatus.equalsIgnoreCase('Rendu')}" class="return-date">
+                                    <div>
+                                        <b>Emprunté le :</b>
+                                        <span th:text="${#temporals.format(loan.beginLoanDate,'dd MMM YYYY')}"></span>
+                                    </div>
+                                    <div th:if="${!loan.loanStatus.equalsIgnoreCase('Prolongé')}">
+                                        <b>A rendre avant le :</b>
+                                        <span th:text="${#temporals.format(loan.endingLoanDate,'dd MMM YYYY')}"></span>
+                                    </div>
+                                    <div th:unless="${!loan.loanStatus.equalsIgnoreCase('Prolongé')}">
+                                        <b>A rendre avant le :</b>
+                                        <span th:text="${#temporals.format(loan.extendLoanDate,'dd MMM YYYY')}"></span>
+                                    </div>
+                                </div>
+                                <div th:unless="${!loan.loanStatus.equalsIgnoreCase('Rendu')}"
+                                     class="return-date disabled-text">
+                                    <div>
+                                        Emprunté le :
+                                        <span th:text="${#temporals.format(loan.beginLoanDate,'dd MMM YYYY')}"></span>
+                                    </div>
+                                    <div>
+                                        Rendu le :
+                                        <span th:text="${#temporals.format(loan.returnLoanDate,'dd MMM YYYY')}"></span>
+                                    </div>
+                                </div>
                             </div>
-                        </a>
+                        </div>
                     </div>
                 </div>
             </div>

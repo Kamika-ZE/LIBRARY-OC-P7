@@ -54,7 +54,7 @@ public class LoanRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createNewLoan(@Valid @RequestBody Loan newLoan, @RequestHeader("Authorization") String accessToken){
+    public ResponseEntity<?> createNewLoan(@Valid @RequestBody Loan newLoan, @RequestHeader("Authorization") String accessToken){
         if (newLoan == null){
             return ResponseEntity.noContent().build();
         }
@@ -64,7 +64,7 @@ public class LoanRestController {
                                .fromCurrentRequest()
                                .path("/{id}")
                                .buildAndExpand(loanSaved.getId()).toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(loanSaved);
     }
 
     @PutMapping("/{id}")
