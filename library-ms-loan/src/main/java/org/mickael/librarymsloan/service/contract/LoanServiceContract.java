@@ -3,7 +3,6 @@ package org.mickael.librarymsloan.service.contract;
 import org.mickael.librarymsloan.exception.LoanNotFoundException;
 import org.mickael.librarymsloan.model.Loan;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface LoanServiceContract {
@@ -27,7 +26,5 @@ public interface LoanServiceContract {
     List<Loan> findAllByCustomerId(Integer id) throws LoanNotFoundException;
 
     List<Loan> findDelayLoan();
-
-    List<LocalDate> findSoonestEndingLoan(Integer bookId);
 
 }

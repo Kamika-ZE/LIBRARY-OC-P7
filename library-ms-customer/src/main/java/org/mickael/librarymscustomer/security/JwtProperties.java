@@ -1,4 +1,4 @@
-package org.mickael.librarymsreservation.security;
+package org.mickael.librarymscustomer.security;
 
 public class JwtProperties {
     public static final String SECRET = "SecretKeyToGenJWTs";

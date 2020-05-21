@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/copies")
-//@PreAuthorize("isAuthenticated()")
+@PreAuthorize("isAuthenticated()")
 public class CopyRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(CopyRestController.class);
@@ -80,7 +81,7 @@ public class CopyRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    //@PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<Copy> createNewCopy(@Valid @RequestBody Copy newCopy){
         if (newCopy == null){
             return ResponseEntity.noContent().build();
@@ -95,7 +96,7 @@ public class CopyRestController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Copy updateCopy(@PathVariable Integer id, @RequestBody Copy copy){
         try {
             return copyServiceContract.update(copy);
@@ -115,7 +116,7 @@ public class CopyRestController {
     }
 
     @DeleteMapping("/{id}")
-    //@PreAuthorize("hasAuthority('DELETE')")
+    @PreAuthorize("hasAuthority('DELETE')")
     public void deleteCopy(@PathVariable Integer id){
         copyServiceContract.deleteById(id);
     }

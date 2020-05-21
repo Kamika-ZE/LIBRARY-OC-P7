@@ -6,7 +6,6 @@ import org.mickael.libraryclientweb.bean.book.SearchBean;
 import org.mickael.libraryclientweb.bean.customer.AccountLoginBean;
 import org.mickael.libraryclientweb.bean.customer.CustomerBean;
 import org.mickael.libraryclientweb.bean.loan.LoanBean;
-import org.mickael.libraryclientweb.bean.reservation.Reservation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.http.HttpStatus;
@@ -75,14 +74,5 @@ public interface FeignProxy {
     LoanBean extendLoan(@PathVariable("id") Integer id, @RequestHeader("Authorization") String accessToken);
 
 
-    /* ==== RESERVATIONS ==== */
-    @PostMapping("/library-ms-reservation/api/reservations")
-    Reservation createReservation(Reservation reservation, @RequestHeader("Authorization") String accessToken);
-
-    @GetMapping("/library-ms-reservation/api/reservations/customer/{customerId}")
-    List<Reservation> getCustomerReservations(@PathVariable("customerId") Integer customerId, @RequestHeader("Authorization") String accessToken);
-
-    @DeleteMapping("/library-ms-reservation/api/reservations/customer/{customerId}/book/{bookId}/")
-    void deleteReservationAfterLoan(@PathVariable("customerId") Integer customerId, @PathVariable("bookId") Integer bookId, @RequestHeader("Authorization") String accessToken);
 
 }

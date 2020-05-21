@@ -1,4 +1,4 @@
-package org.mickael.librarymsreservation.security;
+package org.mickael.librarymscustomer.security;
 
 
 import org.springframework.context.annotation.Bean;

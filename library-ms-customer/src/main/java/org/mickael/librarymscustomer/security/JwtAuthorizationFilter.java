@@ -1,4 +1,4 @@
-package org.mickael.librarymsreservation.security;
+package org.mickael.librarymscustomer.security;
 
 import com.auth0.jwt.JWT;
 import org.springframework.security.authentication.AuthenticationManager;
