@@ -56,7 +56,10 @@ les informations liées à la Base de donnée.
 	
 L'application a été développée suivant une architecture microservice
 
-![architecture diagram](Architecture P7 Diagram.jpeg)
+![archi diag](Architecture P7 Diagram.png)
+
+![architecture diagram](Architecture P7 Diagram.jpg)
+
 
 ## Déploiement
 
