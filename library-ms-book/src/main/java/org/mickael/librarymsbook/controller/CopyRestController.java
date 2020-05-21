@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/copies")
-//@PreAuthorize("isAuthenticated()")
+@PreAuthorize("isAuthenticated()")
 public class CopyRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(CopyRestController.class);
@@ -47,6 +48,16 @@ public class CopyRestController {
         }
     }
 
+    @GetMapping("/book/{id}")
+    public List<Copy> getCopiesForOneBook(@PathVariable Integer id){
+        try {
+            return copyServiceContract.findAllCopyForOneBook(id);
+        } catch (CopyNotFoundException ex){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Copies found", ex);
+        }
+    }
+
+
     @GetMapping("/search")
     public List<Copy> getCopiesBySearchValue(@RequestParam(value = "criteria", required = false) String criteria,
                                              @RequestParam(value = "searchValue", required = false) String searchValue,
@@ -70,7 +81,7 @@ public class CopyRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    //@PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<Copy> createNewCopy(@Valid @RequestBody Copy newCopy){
         if (newCopy == null){
             return ResponseEntity.noContent().build();
@@ -85,7 +96,7 @@ public class CopyRestController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Copy updateCopy(@PathVariable Integer id, @RequestBody Copy copy){
         try {
             return copyServiceContract.update(copy);
@@ -94,10 +105,35 @@ public class CopyRestController {
         }
     }
 
+    @PutMapping("/book/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateLoanCopy(@PathVariable Integer id){
+        try {
+            copyServiceContract.updateAvailableCopy(id);
+        } catch (CopyNotFoundException ex){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provide correct Copy ID", ex);
+        }
+    }
+
     @DeleteMapping("/{id}")
-    //@PreAuthorize("hasAuthority('DELETE')")
+    @PreAuthorize("hasAuthority('DELETE')")
     public void deleteCopy(@PathVariable Integer id){
         copyServiceContract.deleteById(id);
+    }
+
+    @GetMapping("/available/book/{bookId}")
+    public boolean checkIfCopyAvailableForBook(@PathVariable Integer bookId){
+        List<Copy> copies = copyServiceContract.findAllCopyAvailableForOneBook(bookId);
+        if (!copies.isEmpty()){
+            return true;
+        }
+        return false;
+    }
+
+    @GetMapping("/available-number/book/{bookId}")
+    public Integer numberOfCopyAvailableForBook(@PathVariable Integer bookId){
+        Integer number = copyServiceContract.getNumberOfAvailableCopiesForOneBook(bookId);
+        return number;
     }
 
 

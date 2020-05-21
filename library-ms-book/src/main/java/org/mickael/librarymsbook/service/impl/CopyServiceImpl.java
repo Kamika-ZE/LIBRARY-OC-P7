@@ -33,7 +33,18 @@ public class CopyServiceImpl implements CopyServiceContract {
 
     @Override
     public List<Copy> findAllCopyAvailableForOneBook(Integer id) throws CopyNotFoundException {
-        List<Copy> copies = copyRepository.findAllCopyAvailableForOneBook(id);
+        List<Copy> copies = new ArrayList<>();
+        copies = copyRepository.findAllCopyAvailableForOneBook(id);
+        if (copies.isEmpty()){
+            throw new CopyNotFoundException("No copy found");
+        }
+        return copies;
+    }
+
+    @Override
+    public List<Copy> findAllCopyForOneBook(Integer bookId) throws CopyNotFoundException {
+        List<Copy> copies = new ArrayList<>();
+        copies = copyRepository.findAllCopyForOneBook(bookId);
         if (copies.isEmpty()){
             throw new CopyNotFoundException("No copy found");
         }
@@ -90,6 +101,27 @@ public class CopyServiceImpl implements CopyServiceContract {
     @Override
     public void deleteById(Integer id) {
         copyRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateAvailableCopy(Integer id) throws CopyNotFoundException{
+        Optional<Copy> optionalCopy = copyRepository.findById(id);
+        if (!optionalCopy.isPresent()){
+            throw new CopyNotFoundException("Copy not found in repository");
+        }
+        Copy copy = optionalCopy.get();
+        if (copy.isAvailable()){
+            System.out.println(copy.isAvailable());
+            copy.setAvailable(false);
+        } else {
+            copy.setAvailable(true);
+        }
+        copyRepository.save(copy);
+    }
+
+    @Override
+    public Integer getNumberOfAvailableCopiesForOneBook(Integer bookId) {
+        return copyRepository.findAllCopiesForOneBook(bookId);
     }
 
 }

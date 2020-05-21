@@ -59,13 +59,9 @@ public class CustomerServiceImpl implements CustomerServiceContract {
         }
 
         Customer savedCustomer = new Customer();
-        savedCustomer.setRoles(Role.CLIENT.getAbbreviation());
         logger.info("Roles value : " + Role.CLIENT.getAbbreviation());
-        savedCustomer.setPermissions(Customer.getPermissions());
-        savedCustomer.setActive(true);
         savedCustomer.setRegistrationDate(LocalDateTime.now());
         savedCustomer.setUpdateDate(LocalDateTime.now());
-        savedCustomer.setPassword(/*passwordEncoder.encode*/(Customer.getPassword()));
         CustomerRepository.save(savedCustomer);
         return savedCustomer;
     }
@@ -79,7 +75,6 @@ public class CustomerServiceImpl implements CustomerServiceContract {
         Customer UpdateCustomer = new Customer();
         UpdateCustomer.setAddress(existingCustomer.get().getAddress());
         UpdateCustomer.setUpdateDate(LocalDateTime.now());
-        UpdateCustomer.setPassword(/*passwordEncoder.encode*/(Customer.getPassword()));
         CustomerRepository.save(UpdateCustomer);
         return UpdateCustomer;
     }
